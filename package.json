@@ -1,0 +1,32 @@
+{
+  "name": "omnirush.ai",
+  "version": "1.0.0",
+  "description": "AEGIS autonomous operations control center",
+  "main": "dist/src/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/src/server.js",
+    "test": "vitest run tests/workflow.test.ts tests/orchestrator.test.ts tests/execution-service.test.ts tests/agents.test.ts tests/safety-gate.test.ts tests/diagnostician.test.ts tests/architect.test.ts tests/recovery.test.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^18.0.8",
+    "express": "^5.3.0",
+    "openai": "^7.34.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.5",
+    "@types/supertest": "^7.2.1",
+    "supertest": "^7.3.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}
