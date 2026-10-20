@@ -4,6 +4,7 @@ import { createApp } from "../src/app";
 import { Planner } from "../src/planner";
 import { WorkflowOrchestrator } from "../src/orchestrator";
 import { WorkflowExecutionService } from "../src/execution-service";
+import { workflowPlanJsonSchema } from "../src/workflow/schema";
 
 const validPlan = {
   version: 1,
@@ -19,6 +20,13 @@ function plannerReturning(value: unknown): Planner {
 }
 
 describe("AEGIS planning API", () => {
+  it("keeps the planner structured-output schema compatible with OpenAI restrictions", () => {
+    const schemaText = JSON.stringify(workflowPlanJsonSchema);
+
+    expect(schemaText).not.toContain("oneOf");
+    expect(workflowPlanJsonSchema.properties.nodes.items.properties.validation).toMatchObject({ type: ["object", "null"] });
+  });
+
   it("returns a validated plan", async () => {
     const response = await request(createApp(plannerReturning(validPlan))).post("/api/plan").send({ objective: "Collect a report" });
     expect(response.status).toBe(200);

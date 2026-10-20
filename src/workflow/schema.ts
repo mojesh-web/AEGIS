@@ -21,7 +21,7 @@ export const workflowNodeSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().min(1).max(2000),
   dependencies: z.array(z.string()).max(50),
-  validation: validationContractSchema.optional(),
+  validation: validationContractSchema.nullable().optional(),
 });
 
 export const workflowPlanSchema = z.object({
@@ -48,7 +48,7 @@ export const workflowPlanJsonSchema = {
       items: {
         type: "object",
         additionalProperties: false,
-        required: ["id", "type", "title", "description", "dependencies"],
+        required: ["id", "type", "title", "description", "dependencies", "validation"],
         properties: {
           id: { type: "string", pattern: "^[a-z][a-z0-9_-]*$" },
           type: { type: "string", enum: ["browser", "code", "research", "validator"] },
@@ -56,28 +56,15 @@ export const workflowPlanJsonSchema = {
           description: { type: "string", minLength: 1, maxLength: 2000 },
           dependencies: { type: "array", maxItems: 50, items: { type: "string" } },
           validation: {
-            oneOf: [
-              {
-                type: "object",
-                additionalProperties: false,
-                required: ["kind", "fields"],
-                properties: {
-                  kind: { const: "required-fields" },
-                  target: { type: "string", minLength: 1 },
-                  fields: { type: "array", minItems: 1, maxItems: 100, items: { type: "string", minLength: 1 } },
-                },
-              },
-              {
-                type: "object",
-                additionalProperties: false,
-                required: ["kind", "expected"],
-                properties: {
-                  kind: { const: "equals" },
-                  target: { type: "string", minLength: 1 },
-                  expected: {},
-                },
-              },
-            ],
+            type: ["object", "null"],
+            additionalProperties: false,
+            required: ["kind", "target", "fields", "expected"],
+            properties: {
+              kind: { type: "string", enum: ["required-fields", "equals"] },
+              target: { type: ["string", "null"] },
+              fields: { type: ["array", "null"], minItems: 1, maxItems: 100, items: { type: "string", minLength: 1 } },
+              expected: {},
+            },
           },
         },
       },
