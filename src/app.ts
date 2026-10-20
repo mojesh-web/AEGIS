@@ -1,3 +1,4 @@
+import cors from "cors";
 import express, { ErrorRequestHandler } from "express";
 import { Planner, GroqPlanner } from "./planner";
 import { WorkflowOrchestrator } from "./orchestrator";
@@ -10,6 +11,24 @@ import { WorkflowArchitect, failureContextSchema } from "./workflow/architect";
 
 export function createApp(planner?: Planner, orchestrator?: WorkflowOrchestrator, executionService?: ExecutionService, recoveryService?: RecoveryService) {
   const app = express();
+  const configuredFrontendOrigin = process.env.FRONTEND_ORIGIN?.trim();
+  const allowedOrigins = configuredFrontendOrigin ? configuredFrontendOrigin.split(",").map((origin) => origin.trim()).filter(Boolean) : [];
+
+  // Same-origin requests remain available when FRONTEND_ORIGIN is absent. Cross-origin
+  // requests are denied by default rather than falling back to '*'.
+  app.use(cors({
+    origin: (requestOrigin, callback) => {
+      if (!requestOrigin || allowedOrigins.includes(requestOrigin)) {
+        callback(null, true);
+        return;
+      }
+      callback(null, false);
+    },
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: false,
+    optionsSuccessStatus: 204,
+  }));
   app.use(express.json({ limit: "32kb" }));
   const activeOrchestrator = orchestrator ?? new WorkflowOrchestrator(new AgentDispatcher().asWorkflowNodeHandler());
   const activeExecutionService = executionService ?? new WorkflowExecutionService(activeOrchestrator);

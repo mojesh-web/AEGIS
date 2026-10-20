@@ -9,6 +9,9 @@ import { SQLiteRecoveryService } from "./recovery/service";
 import { WorkflowArchitect } from "./workflow/architect";
 
 const port = Number(process.env.PORT ?? 3000);
+if (!process.env.FRONTEND_ORIGIN?.trim()) {
+  console.warn("FRONTEND_ORIGIN is not configured; cross-origin browser requests are disabled.");
+}
 const databasePath = resolve(process.env.SQLITE_PATH ?? "data/aegis.sqlite");
 mkdirSync(dirname(databasePath), { recursive: true });
 const orchestrator = new WorkflowOrchestrator(async (node, context) => ({

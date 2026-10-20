@@ -17,6 +17,43 @@ const plan = {
 const planner: Planner = { createPlan: async () => plan };
 
 describe("public API audit", () => {
+  it("allows the configured frontend origin and handles preflight without enabling credentials", async () => {
+    const previousOrigin = process.env.FRONTEND_ORIGIN;
+    process.env.FRONTEND_ORIGIN = "https://aegis-askwd17jq-mojesh1.vercel.app";
+    try {
+      const app = createApp(planner);
+      const allowed = await request(app)
+        .options("/api/plan")
+        .set("Origin", "https://aegis-askwd17jq-mojesh1.vercel.app")
+        .set("Access-Control-Request-Method", "POST")
+        .set("Access-Control-Request-Headers", "Content-Type, Authorization");
+
+      expect(allowed.status).toBe(204);
+      expect(allowed.headers["access-control-allow-origin"]).toBe("https://aegis-askwd17jq-mojesh1.vercel.app");
+      expect(allowed.headers["access-control-allow-methods"]).toContain("POST");
+      expect(allowed.headers["access-control-allow-headers"]).toContain("Content-Type");
+      expect(allowed.headers["access-control-allow-credentials"]).toBeUndefined();
+
+      const denied = await request(app).post("/api/plan").set("Origin", "https://untrusted.example").send({ objective: "Audit API behavior" });
+      expect(denied.headers["access-control-allow-origin"]).toBeUndefined();
+    } finally {
+      if (previousOrigin === undefined) delete process.env.FRONTEND_ORIGIN;
+      else process.env.FRONTEND_ORIGIN = previousOrigin;
+    }
+  });
+
+  it("denies cross-origin access safely when FRONTEND_ORIGIN is missing", async () => {
+    const previousOrigin = process.env.FRONTEND_ORIGIN;
+    delete process.env.FRONTEND_ORIGIN;
+    try {
+      const response = await request(createApp(planner)).post("/api/plan").set("Origin", "https://aegis-askwd17jq-mojesh1.vercel.app").send({ objective: "Audit API behavior" });
+      expect(response.status).toBe(200);
+      expect(response.headers["access-control-allow-origin"]).toBeUndefined();
+    } finally {
+      if (previousOrigin !== undefined) process.env.FRONTEND_ORIGIN = previousOrigin;
+    }
+  });
+
   it("supports health, valid planning, invalid planning, execution, and history retrieval", async () => {
     const orchestrator = new WorkflowOrchestrator(async (node) => `done:${node.id}`);
     const executionService = new WorkflowExecutionService(orchestrator);

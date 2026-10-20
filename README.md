@@ -37,10 +37,13 @@ Available backend variables:
 
 ```env
 PORT=3000
+FRONTEND_ORIGIN=https://aegis-askwd17jq-mojesh1.vercel.app
 GROQ_API_KEY=replace-with-your-groq-api-key
 GROQ_MODEL=replace-with-a-groq-model-id-you-have-access-to
 SQLITE_PATH=data/aegis.sqlite
 ```
+
+`FRONTEND_ORIGIN` is an exact comma-separated allowlist for browser origins. If it is missing, same-origin requests still work but cross-origin browser requests are denied safely; it never falls back to `*`. Set it in the Render service environment to the deployed Vercel origin.
 
 Run the backend in development:
 
