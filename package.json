@@ -8,7 +8,7 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "start": "node dist/src/server.js",
-    "test": "vitest run tests/workflow.test.ts tests/orchestrator.test.ts tests/execution-service.test.ts tests/agents.test.ts tests/safety-gate.test.ts tests/diagnostician.test.ts tests/architect.test.ts tests/recovery.test.ts tests/api-audit.test.ts"
+    "test": "vitest run tests/workflow.test.ts tests/orchestrator.test.ts tests/execution-service.test.ts tests/agents.test.ts tests/safety-gate.test.ts tests/diagnostician.test.ts tests/architect.test.ts tests/recovery.test.ts tests/api-audit.test.ts tests/planner.test.ts"
   },
   "keywords": [],
   "author": "",

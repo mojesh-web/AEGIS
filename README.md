@@ -4,7 +4,7 @@ AEGIS is a TypeScript/Express autonomous-operations control center. It turns a v
 
 ## Implemented capabilities
 
-- Structured workflow planning through an OpenAI-compatible planner.
+- Structured workflow planning through Groq's OpenAI-compatible API.
 - Zod validation for workflow plans, node types, validation contracts, dependencies, and cycles.
 - Deterministic dependency-aware orchestration with independent-branch continuation.
 - Typed specialist dispatch with a deterministic Validator Agent and side-effect-free placeholders for other agent types.
@@ -20,7 +20,7 @@ This project does not currently perform real browser automation, arbitrary shell
 ## Requirements
 
 - Node.js 24 or newer (the backend uses `node:sqlite`).
-- An OpenAI-compatible API key and model only when using the planning endpoint.
+- A Groq API key and accessible Groq model only when using the planning endpoint.
 
 ## Backend setup
 
@@ -37,8 +37,8 @@ Available backend variables:
 
 ```env
 PORT=3000
-OPENAI_API_KEY=replace-with-your-openai-api-key
-OPENAI_MODEL=replace-with-a-model-id-you-have-access-to
+GROQ_API_KEY=replace-with-your-groq-api-key
+GROQ_MODEL=replace-with-a-groq-model-id-you-have-access-to
 SQLITE_PATH=data/aegis.sqlite
 ```
 

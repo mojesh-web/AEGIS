@@ -20,7 +20,7 @@ function plannerReturning(value: unknown): Planner {
 }
 
 describe("AEGIS planning API", () => {
-  it("keeps the planner structured-output schema compatible with OpenAI restrictions", () => {
+  it("keeps the workflow schema compatible with Groq JSON mode", () => {
     const schemaText = JSON.stringify(workflowPlanJsonSchema);
 
     expect(schemaText).not.toContain("oneOf");

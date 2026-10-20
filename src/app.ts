@@ -1,5 +1,5 @@
 import express, { ErrorRequestHandler } from "express";
-import { Planner, OpenAIPlanner } from "./planner";
+import { Planner, GroqPlanner } from "./planner";
 import { WorkflowOrchestrator } from "./orchestrator";
 import { ExecutionService, WorkflowExecutionService } from "./execution-service";
 import { validateWorkflowPlan, WorkflowValidationError } from "./workflow/validate";
@@ -38,7 +38,7 @@ export function createApp(planner?: Planner, orchestrator?: WorkflowOrchestrator
         response.status(400).json({ error: "objective must be 4000 characters or fewer" });
         return;
       }
-      const activePlanner = planner ?? new OpenAIPlanner(process.env.OPENAI_API_KEY, process.env.OPENAI_MODEL);
+      const activePlanner = planner ?? new GroqPlanner(process.env.GROQ_API_KEY, process.env.GROQ_MODEL);
       const plan = validateWorkflowPlan(await activePlanner.createPlan(objective.trim()));
       response.status(200).json(plan);
     } catch (error) {
@@ -119,7 +119,7 @@ export function createApp(planner?: Planner, orchestrator?: WorkflowOrchestrator
     }
     const status = typeof error === "object" && error !== null && "status" in error ? error.status : undefined;
     if (status === 401 || status === 403) {
-      response.status(502).json({ error: "OpenAI API authentication failed" });
+      response.status(502).json({ error: "Groq API authentication failed" });
       return;
     }
     response.status(502).json({ error: "Planning service failed", details: message });

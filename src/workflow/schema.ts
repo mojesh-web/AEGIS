@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const nodeTypeSchema = z.enum(["browser", "code", "research", "validator"]);
 
-export const validationContractSchema = z.discriminatedUnion("kind", [
+const validationContractObjectSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("required-fields"),
     target: z.string().min(1).optional(),
@@ -14,6 +14,16 @@ export const validationContractSchema = z.discriminatedUnion("kind", [
     expected: z.unknown(),
   }),
 ]);
+
+/** Accepts JSON-mode nulls for optional contract fields and normalizes them away. */
+export const validationContractSchema = z.preprocess((value) => {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return value;
+  const candidate = value as Record<string, unknown>;
+  const normalized = { ...candidate };
+  if (normalized.target === null) delete normalized.target;
+  if (normalized.fields === null) delete normalized.fields;
+  return normalized;
+}, validationContractObjectSchema);
 
 export const workflowNodeSchema = z.object({
   id: z.string().regex(/^[a-z][a-z0-9_-]*$/, "Node IDs must start with a lowercase letter and contain only a-z, 0-9, _ or -"),
